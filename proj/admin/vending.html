@@ -1,0 +1,205 @@
+<!doctype html>
+<html>
+
+<head>
+	<script src="https://storage.googleapis.com/code.getmdl.io/1.0.2/material.min.js"></script>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"/>
+	<link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.2/material.amber-blue.min.css" />
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+	<title>Admin Vending</title>
+	<link rel="stylesheet" href="../style.css" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.css"/>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+	<script src="../master.js"></script>
+</head>
+<body>
+<!-- The drawer is always open in large screens. The header is always shown,
+  even in small screens. -->
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
+  <header class="mdl-layout__header">
+    <div class="mdl-layout__header-row">
+	<span class="mdl-layout-title">&nbsp; API - Admin</span>
+      <div class="mdl-layout-spacer"></div>       
+    </div>
+  </header>
+  <div class="mdl-layout__drawer">  
+    <span class="mdl-layout-title"> <i class="material-icons" role="presentation">list</i>&nbsp;Menu</span>
+    <nav class="mdl-navigation" style="overflow-x: hidden">
+      <a class="mdl-navigation__link" href="../index.html">
+		<i class="material-icons" role="presentation">home</i>&nbsp;Home</a>
+	 <a class="mdl-navigation__link" href="products.html">
+	 <i class="material-icons" role="presentation">supervisor_account</i>&nbsp;Admin</a>	 
+	  <a class="mdl-navigation__link" href="../order.html">
+	  <i class="material-icons" style="width:24px" >shoppping_cart</i>&nbsp;Place order</a>
+      <a class="mdl-navigation__link" href="../settings.html">
+	  <i class="material-icons" role="presentation">settings</i>&nbsp;Settings</a>
+    </nav>
+  </div>
+  
+  
+  <main class="mdl-layout__content">   
+  <ul>
+	 <a href="products.html" class="mdl-navigation__link">Products</a> &nbsp;
+      <a href="vending.html" class="mdl-navigation__link">Vending Machines</a>&nbsp;
+      <a href="offers.html" class="mdl-navigation__link">Offers</a>
+  </ul>
+	<div class="admin_content ">
+		<br/>
+		<div class="mdl-grid">			
+			<div class="mdl-cell mdl-cell--12-col-col">
+				<table class="mdl-data-table mdl-js-data-table">
+					<thead>
+						<tr>
+							<th  class="mdl-data-table__cell--non-numeric"> Name</th>
+							<th  class="mdl-data-table__cell--non-numeric"> Address</th>
+							<th  class="mdl-data-table__cell--non-numeric"> Location</th>
+							<th  class="mdl-data-table__cell--non-numeric">&nbsp;</th>
+						</tr>
+					</thead>
+					<tbody class="tdata">
+						<tr><td></td></tr>
+					</tbody>
+				</table>		
+			</div>
+		</div>
+		<br/>	
+		<div class="mdl-grid">
+			<div class="mdl-cell mdl-cell--1-col"></div>
+			<div class="mdl-cell mdl-cell--11-col-col">
+				<div class="mdl-card mdl-shadow--2dp cream">
+					<div class="mdl-card__title">
+						<h2 class="mdl-card__title-text">Add Vending Machine</h2>
+					</div>
+					<div class="mdl-card__supporting-text">					
+						<span class="sline">Name: <input class='mdl-textfield__input' id="vname" type='text'/></span>
+						<br/><br/><span class="sline">Location: <span class="list" id="vloc"></span></span>						
+						
+					</div>
+					<div class="mdl-card__actions mdl-card--border">
+						<a id="save" class="mdl-button mdl-button--accent mdl-js-button mdl-js-ripple-effect">
+							Save
+						</a>
+					</div>
+					<div class="mdl-card__menu">
+						<button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect disabled mdl-button--accent">
+						  <i class="material-icons">add</i>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		</div>
+  </main>
+
+</div>
+
+<script type="text/javascript">
+
+	function addStock(Event){
+		var a = Number(Event.id)+1;		
+		window.location.replace("stock.html?id="+a);
+		return false;
+	}
+	
+	function Delete(Event){
+		var id = Event.id;
+		var Pid = $("#oid"+id).val();
+		var request =$.ajax({
+			url:url+"deleteVendingMachine?CompanyID="+company+"&APIKey="+key+"&UserID="+user
+			+"&ID="+Pid,
+			dataType:"json",
+			method:"GET"
+		});		
+		request.success(function(){
+			bindtable();
+		});
+		request.fail(function(data){
+			alert("fail"+data.responseText);
+		});
+	}
+		
+	function change(Event){
+		var id = Event.id;
+		var name= $("#Name"+id).val();
+		var location= $("#loc"+id+" :selected").val();
+		var Pid = $("#oid"+id).val();
+		var request =$.ajax({
+			url:url+"updateVendingMachine?CompanyID="+company+"&APIKey="+key+"&UserID="+user+"&name="+
+			name+"&locationid="+location+"&ID="+Pid,
+			dataType:"json",
+			method:"GET"
+		});		
+		request.success(function(){		
+			bindtable();
+		});
+		request.fail(function(data){
+			alert("fail"+data.responseText);
+		});	
+	}
+	
+	
+	$("#save").click(function(){
+		
+		var name= $("#vname").val();
+		var location =$("#vloc :selected").val();
+		var request =$.ajax({
+			url:url+"addVendingMachine?CompanyID="+company+"&APIKey="+key+"&UserID="+user+"&name="+
+			name+"&locationid="+location,
+			dataType:"json",
+			method:"GET"
+		});		
+		request.success(function(){
+			bindtable();
+		});
+		request.fail(function(){
+			alert("fail");
+		});
+	});
+	
+	bindtable();
+	
+	function bindtable(){	
+	
+	var datas = null;
+		var request =$.ajax({
+			url:url+"vendingByCompany?CompanyID="+company+"&APIKey="+key+"&UserID="+user+"&ID="+company,
+			dataType:"json",
+			method:"GET"
+		});
+		request.success(function(data){			
+			datas= data.Vendingmachines;		
+				
+			var text="";
+		for(var i=0;i<datas.length; i++){
+			text +="<tr><td class='mdl-data-table__cell--non-numeric'><div class='mdl-textfield mdl-js-textfield'>"
+			+"<input class='mdl-textfield__input' type='text' id='Name"+i+"'value='"+datas[i].Name+"'/>"
+			+"<label class='mdl-textfield__label' for='Name"+i+"'>"+datas[i].Name+"</label></div></td>"
+			+"<td class='mdl-data-table__cell--non-numeric'><div class='mdl-textfield mdl-js-textfield'>"
+			+"<input class='mdl-textfield__input' type='text' id='Town"+i+"' value='"+datas[i].Location.Towncity+" "+datas[i].Location.Addressline+"' disabled/>"
+			+"<label class='mdl-textfield__label' for='Town"+i+"'>"+datas[i].Location.Towncity+" "+datas[i].Location.Addressline+"</label></div></td>"
+			+"<td class='mdl-data-table__cell--non-numeric'><span class='list'id='loc"+i+"'></span></td>"
+			+"<td class='mdl-data-table__cell--non-numeric'>"
+			+"<button class='mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect mdl-button--accent' onclick='change(this)' id='"+i+"'>"
+			+"<i class='material-icons'>save</i></button>"
+			+"<button class='mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect mdl-button--accent' onclick='Delete(this)' id='"+i+"'>"
+			+"<i class='material-icons'>delete</i></button>"
+			+"<button class='mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect mdl-button--accent' onclick='addStock(this)' id='"+i+"'>"
+			+"<i class='material-icons'>input</i></button>"
+			+"<input type='hidden' id='oid"+i+"' value='"+datas[i].Vendingmachineid+"'/></td>"
+			+"</tr>";	
+		}
+		
+		$(".tdata").html(text);
+		var a=loactions();
+		$.when(a).then(function(){
+			for(var i=0;i<datas.length; i++){		
+			$("#loc"+i+" option[value='"+datas[i].Locationid+"']").prop('selected', true).change();
+			}
+		});		
+	});	
+	}
+	
+</script>
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!doctype html>
+<html>
+
+<head>
+	<script src="https://storage.googleapis.com/code.getmdl.io/1.0.2/material.min.js"></script>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"/>
+	<link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.2/material.amber-blue.min.css" />
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+	<title>Order</title>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.css"/>
+	<link rel="stylesheet" href="style.css" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+	<script src="master.js"></script>
+</head>
+<body>
+<!-- The drawer is always open in large screens. The header is always shown,
+  even in small screens. -->
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
+  <header class="mdl-layout__header">
+    <div class="mdl-layout__header-row">
+	<span class="mdl-layout-title">&nbsp; API - Order</span>
+      <div class="mdl-layout-spacer"></div>       
+    </div>
+  </header>
+  <div class="mdl-layout__drawer">  
+    <span class="mdl-layout-title"> <i class="material-icons" role="presentation">list</i>&nbsp;Menu</span>
+    <nav class="mdl-navigation" style="overflow-x: hidden">
+      <a class="mdl-navigation__link" href="index.html">
+		<i class="material-icons" role="presentation">home</i>&nbsp;Home</a>
+	 <a class="mdl-navigation__link" href="admin/products.html">
+	 <i class="material-icons" role="presentation">supervisor_account</i>&nbsp;Admin</a>	 
+	  <a class="mdl-navigation__link" href="order.html">
+	  <i class="material-icons" style="width:24px" >shoppping_cart</i>&nbsp;Place order</a>
+      <a class="mdl-navigation__link" href="settings.html">
+	  <i class="material-icons" role="presentation">settings</i>&nbsp;Settings</a>
+    </nav>
+  </div>
+    
+  <main class="mdl-layout__content">   
+	<div class="admin_content ">
+	<br/>
+	<span class="list" id="loc"></span>
+		<br/>
+		<div class="mdl-grid">			
+			<div class="mdl-cell mdl-cell--12-col-col">
+				<table class="mdl-data-table mdl-js-data-table">
+					<thead>
+						<tr>
+							<th  class="mdl-data-table__cell--non-numeric"> Name</th>
+							<th  class="mdl-data-table__cell--non-numeric"> Description</th>
+							<th  class="mdl-data-table__cell--non-numeric"> Image</th>
+							<th  class="mdl-data-table__cell--non-numeric"> Name</th>
+							<th> Quanitity </th>
+							<th> Retail Price </th>							
+							<th  class="mdl-data-table__cell--non-numeric">&nbsp;</th>
+						</tr>
+					</thead>
+					<tbody class="tdata">
+						<tr><td></td></tr>
+					</tbody>
+				</table>		
+			</div>
+		</div>
+		<div class="offers">
+			Offers:
+			<!--cust offer any prod-->
+			<span class="clist"></span>
+			<input type="hidden" id="pofferid"/>
+			<input type="hidden" id="sid"/>
+			<!--product offer anyone-->
+			<span class="plist"></span>
+			<!--product offer just this cust-->
+			<span class="olist"></span>
+			<br/>
+			<button class='mdl-button  mdl-js-button mdl-js-ripple-effect mdl-button--accent' id='order'>
+				Order
+			</button>
+		</div>
+	</div>
+  </main>
+
+</div>
+
+<script type="text/javascript">
+$(".offers").hide();
+var loaction =1;
+	$("#loc").change(function(){
+		loaction=$("#loc :selected").val();
+		bindtable();
+	});
+				
+	$("#order").click(function(){
+	
+		var cid=$(".clist :selected").val();
+		var pid=$(".plist :selected").val();
+		var oid=$(".olist :selected").val();
+		
+		var offers="";
+		if(!isNaN(cid)){
+			offers = cid;
+		}else if(!isNaN(pid))
+			offers = pid;
+		else if(!isNaN(oid))
+			offers =oid;
+			
+		var request =$.ajax({
+			url:url+"order?CompanyID="+company+"&APIKey="+key+"&UserID="+user+
+			"&customerid="+user+"&stockid="+$("#sid").val()+"&offerid="+offers,
+			dataType:"json"
+		});		
+		request.success(function(){	
+			alert("Ordered");
+			bindtable();
+		});
+		request.fail(function(data){
+			alert("fail"+data.responseText);
+		});	
+	});
+	
+	function change(Event){
+		var id = Event.id;
+		var name= $("#oid"+id).val();
+		var location= $("#loc"+id+" :selected").val();
+		var pid =$("#pid"+id).val();
+		$(".offers").show();
+		$("#pofferid").val(pid);
+		$("#sid").val(name);
+		offers();
+	
+	}
+		
+	bindtable();
+	
+	function bindtable(){	
+	
+	var datas = null;
+		var request =$.ajax({
+			url:url+"vendingStockByLocation?CompanyID="+company+"&APIKey="+key+"&UserID="+user+"&ID="+loaction,
+			dataType:"json",
+			method:"GET"			
+		});
+		request.success(function(data){		
+			
+			datas= data.Stocks;						
+			var text="";
+		for(var i=0;i<datas.length; i++){
+			text +="<tr><td class='mdl-data-table__cell--non-numeric'>"
+			+datas[i].Product.Name+"</td>"
+			+"<td class='mdl-data-table__cell--non-numeric'>"
+			+datas[i].Product.Description+"</td>"
+			+"<td class='mdl-data-table__cell--non-numeric'>"
+			+datas[i].Product.Image+"</td>"
+			+"<td class='mdl-data-table__cell--non-numeric'>"
+			+datas[i].Vendingmachine.Name+"</td>"				
+			+"<td>"+datas[i].Quanitity+"</td>"
+			+"<td>"+datas[i].Retailprice+"</td>"
+			+"<td class='mdl-data-table__cell--non-numeric'>"
+			+"<button class='mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect mdl-button--accent' onclick='change(this)' id='"+i+"'>"
+			+"<i class='material-icons'>add_shopping_cart</i></button>"			
+			+"<input type='hidden' id='oid"+i+"' value='"+datas[i].Stockid+"'/></td>"
+			+"</tr>";
+		}
+		
+		$(".tdata").html(text);		
+	});	
+	}
+	loactions();
+	coffer();
+	
+	
+</script>
+</body>
+</html>

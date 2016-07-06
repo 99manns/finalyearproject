@@ -1,0 +1,157 @@
+<!doctype html>
+<html>
+
+<head>
+	<script src="https://storage.googleapis.com/code.getmdl.io/1.0.2/material.min.js"></script>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"/>
+	<link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.2/material.amber-blue.min.css" />
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+	<link rel="stylesheet" href="style.css" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.css"/>
+	<script src="master.js"></script>
+	<script src="chart.js"></script>
+	<script src="chartoptions.js"></script>
+	<title>Report</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+<!-- The drawer is always open in large screens. The header is always shown,
+  even in small screens. -->
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
+  <header class="mdl-layout__header">
+    <div class="mdl-layout__header-row">
+	<span class="mdl-layout-title">&nbsp; API - Dashboard</span>
+      <div class="mdl-layout-spacer"></div>       
+    </div>
+  </header>
+  <div class="mdl-layout__drawer">  
+    <span class="mdl-layout-title"> <i class="material-icons" role="presentation">list</i>&nbsp;Menu</span>
+    <nav class="mdl-navigation" style="overflow-x: hidden">
+      <a class="mdl-navigation__link" href="index.html">
+		<i class="material-icons" role="presentation">home</i>&nbsp;Home</a>
+	 <a class="mdl-navigation__link" href="admin/products.html">
+	 <i class="material-icons" role="presentation">supervisor_account</i>&nbsp;Admin</a>	 
+	  <a class="mdl-navigation__link" href="order.html">
+	  <i class="material-icons" style="width:24px" >shoppping_cart</i>&nbsp;Place order</a>
+      <a class="mdl-navigation__link" href="settings.html">
+	  <i class="material-icons" role="presentation">settings</i>&nbsp;Settings</a>
+    </nav>
+  </div>
+  <main class="mdl-layout__content">    	
+  <h4> Report </h4>
+			  <span class="smalltext">
+				Group by  
+			  <select id="group">
+				<option value="location">Location</option>
+				<option value="user">User</option>
+				<option value="product" selected="true">Product</option>
+				<option value="month">Month</option>
+			  </select>   
+			  </span>
+			  <label for="offer" class="mdl-checkbox mdl-js-checkbox">
+				<input type="checkbox" id="offer" class="mdl-checkbox__input">
+				<span class="mdl-checkbox__label">With Offer</span>
+			  </label>
+			  <label for="date" class="mdl-checkbox mdl-js-checkbox " id="ld">
+			  <input type="checkbox" id="date" class="mdl-checkbox__input">
+				<span class="mdl-checkbox__label">With Date</span>
+			  </label>
+			  <button class='mdl-button  mdl-js-button mdl-js-ripple-effect mdl-button--accent' id='search'>
+						SEARCH
+					</button>
+				
+				<canvas id="pro" ></canvas>		
+	
+		<div class="mdl-grid">
+			<div class="mdl-cell mdl-cell--1-col"></div>
+			<div class="mdl-cell mdl-cell--11-col-col">
+			<table class="mdl-data-table mdl-js-data-table">
+			
+				<thead id="thead">
+					<tr>
+					<th>&nbsp;</th>
+						<th>Revenue</th>
+						<th>Quanitity</th>
+						<th>Profit</th>						
+					</tr>
+				</thead>	
+				<tbody id="da"><tr></tr></tbody>
+				</table>
+			</div>
+		</div>
+  </main>
+</div>
+
+<script type="text/javascript">
+$("#date").prop('checked', true);
+chart();
+
+$("#group").change(function(){
+	var group =$("#group :selected").val();	
+	if(group=="month"){
+		$("#date").prop('checked', false);
+		$("#ld").hide(true);
+		$("#ld").prop('class',
+		$("#ld").prop('class').replace('is-checked',''));
+	}else
+		$("#ld").show();
+	$("#date").prop('checked',$("#date").is(":checked"));
+		
+});
+$("#search").click(function(){
+	chart();
+});
+function chart(){
+var date = $("#date").is(":checked") ?'true':'';
+var offer = $("#offer").is(":checked") ?'offer':'all';
+var group =$("#group :selected").val();	
+
+	var request =$.ajax({
+			url:url+"Report?CompanyID="+company+"&APIKey="+key+"&UserID="+user
+			+"&group="+group+"&type="+offer+"&date="+date+"",
+			dataType:"json",
+			method:"GET"
+		});		
+		request.success(function(dataset){				
+			var temp = dataset.Items;			
+			if(group=='product')
+				var label =  $.map(temp, function(val,i){
+					return val.MonthName+" "+val.ProductName;});			
+			else if(group=='user')
+				var label =  $.map(temp, function(val,i){
+					return val.MonthName+" "+val.UserEmail;});	
+			else if(group=='location')
+				var label =  $.map(temp, function(val,i){
+					return val.MonthName+" "+val.Location;});
+			else
+				var label =  $.map(temp, function(val,i){
+					return val.Month});
+			temp=dataset.Items;
+			var datas = $.map(temp, function(val,i){
+				return  Number(val.Revenue);});
+			var datas1 = $.map(dataset.Items, function(val,i){
+				return  Number(val.Quanitity);});
+			var datas2 = $.map(dataset.Items, function(val,i){
+				return  Number(val.Profit);});
+			
+			var data = barChartData2(label, datas,datas1,datas2);
+			var cd = $("#pro").get(0).getContext("2d");			
+			var text="";
+			for(var i=0;i<dataset.Items.length;i++){
+				text += "<tr>"+"<td>"+label[i]+"</td>"
+				+"<td>"+dataset.Items[i].Revenue+"</td>"
+				+"<td>"+dataset.Items[i].Quanitity+"</td>"
+				+"<td>"+dataset.Items[i].Profit+"</td></tr>";
+			}
+			$("#da").html(text);
+			var temps=new Chart(cd).Bar(data);
+			});
+		request.fail(function(data){
+			alert("fail"+data.responseText);
+		});		
+	
+}
+
+</script>

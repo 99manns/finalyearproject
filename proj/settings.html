@@ -1,0 +1,102 @@
+<!doctype html>
+<html>
+
+<head>
+	<script src="https://storage.googleapis.com/code.getmdl.io/1.0.2/material.min.js"></script>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"/>
+	<link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.2/material.amber-blue.min.css" />
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+	<title>Settings</title>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.css"/>
+	<link rel="stylesheet" href="style.css" />
+	<script src="master.js"></script>
+</head>
+<body>
+<!-- The drawer is always open in large screens. The header is always shown,
+  even in small screens. -->
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
+  <header class="mdl-layout__header">
+    <div class="mdl-layout__header-row">
+	<span class="mdl-layout-title">&nbsp; API - Settings</span>
+      <div class="mdl-layout-spacer"></div>       
+    </div>
+  </header>
+  <div class="mdl-layout__drawer">  
+    <span class="mdl-layout-title"> <i class="material-icons" role="presentation">list</i>&nbsp;Menu</span>
+    <nav class="mdl-navigation" style="overflow-x: hidden">
+      <a class="mdl-navigation__link" href="index.html">
+		<i class="material-icons" role="presentation">home</i>&nbsp;Home</a>
+	 <a class="mdl-navigation__link" href="admin/products.html">
+	 <i class="material-icons" role="presentation">supervisor_account</i>&nbsp;Admin</a>	 
+	  <a class="mdl-navigation__link" href="order.html">
+	  <i class="material-icons" style="width:24px" >shoppping_cart</i>&nbsp;Place order</a>
+      <a class="mdl-navigation__link" href="settings.html">
+	  <i class="material-icons" role="presentation">settings</i>&nbsp;Settings</a>
+    </nav>
+  </div>
+    
+  <main class="mdl-layout__content">   
+  <div style="padding-left: 23px">
+	<br/>	
+			<h5>Change</h5>
+		<br/>
+			 User:&nbsp;<span class="clist"></span>
+		<br/><br/>
+			Company:&nbsp;<span class="colist"></span>
+		<br/>
+		<button class='mdl-button  mdl-js-button mdl-js-ripple-effect mdl-button--accent' id='save'>
+			SAVE
+		</button>
+	</div>
+  </main>
+
+</div>
+
+<script type="text/javascript">
+	bind();
+	
+	function bind(){	
+		
+		var c= customers();
+	
+		var datas = null;
+		var request =$.ajax({
+			url:url+"companies?CompanyID="+company+"&APIKey="+key+"&UserID="+user,
+			dataType:"json",
+			method:"GET"			
+		});
+		request.success(function(data){
+			datas= data.Companies;			
+			var text;			
+			for(var i=0;i <datas.length; i++){			
+			text +="<option value='"+datas[i].Companyid+"/"+datas[i].Apikey+"'>"+
+				datas[i].Name+"</option>";
+			}
+			$(".colist").html("<select>"+text+"</select>");			
+		});	
+	
+	$.when(c,request).then(function(){
+		$(".clist option[value='"+user+"']").prop('selected', true).change();
+		$(".colist option[value='"+company+"/"+key+"']").prop('selected', true).change();
+	});
+	}
+		
+	$("#save").click(function(){
+		
+		var cid=$(".clist :selected").val();
+		var com= $(".colist :selected").val();
+		var ac = com.split("/");
+		
+		company = ac[0];
+		key= ac[1];
+		user = cid;
+		$.cookie("company", company);
+		$.cookie("key", key);
+		$.cookie("user", user);
+		bind();
+	});
+</script>
+</body>
+</html>
