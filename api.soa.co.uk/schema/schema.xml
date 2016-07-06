@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<database name="default" defaultIdMethod="native" defaultPhpNamingMethod="underscore">
+  <table name="company" idMethod="native" phpName="Company">
+    <column name="CompanyID" phpName="Companyid" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="APIkey" phpName="Apikey" type="VARCHAR" size="36" required="true"/>
+    <column name="LocationID" phpName="Locationid" type="INTEGER" required="true"/>
+    <column name="Name" phpName="Name" type="VARCHAR" size="1000" required="true"/>
+    <column name="Telephone" phpName="Telephone" type="VARCHAR" size="500" required="true"/>
+    <column name="delted" phpName="Delted" type="BOOLEAN" size="1" required="true" defaultValue="false"/>
+    <foreign-key foreignTable="location" name="clid">
+      <reference local="LocationID" foreign="LocationID"/>
+    </foreign-key>
+    <index name="company_ibfk_1">
+      <index-column name="LocationID"/>
+    </index>
+    <unique name="APIkey">
+      <unique-column name="APIkey"/>
+    </unique>
+    <vendor type="mysql">
+      <parameter name="Engine" value="InnoDB"/>
+    </vendor>
+  </table>
+  <table name="gender" idMethod="native" phpName="Gender">
+    <column name="GenderID" phpName="Genderid" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="Name" phpName="Name" type="VARCHAR" size="1000" required="true"/>
+    <vendor type="mysql">
+      <parameter name="Engine" value="InnoDB"/>
+    </vendor>
+  </table>
+  <table name="item" idMethod="native" phpName="Item">
+    <column name="ItemID" phpName="Itemid" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="ProductID" phpName="Productid" type="INTEGER" required="true"/>
+    <column name="UserID" phpName="Userid" type="INTEGER" required="true"/>
+    <column name="vendingmachineID" phpName="Vendingmachineid" type="INTEGER" required="true"/>
+    <column name="OfferID" phpName="Offerid" type="INTEGER"/>
+    <column name="PurchasePrice" phpName="Purchaseprice" type="DECIMAL" scale="0" required="true"/>
+    <column name="SalePrice" phpName="Saleprice" type="DECIMAL" scale="0" required="true"/>
+    <column name="AddedDate" phpName="Addeddate" type="TIMESTAMP" required="true"/>
+    <foreign-key foreignTable="offer" name="ioid">
+      <reference local="OfferID" foreign="OfferID"/>
+    </foreign-key>
+    <foreign-key foreignTable="product" name="ipid">
+      <reference local="ProductID" foreign="ProductID"/>
+    </foreign-key>
+    <foreign-key foreignTable="user" name="iuid">
+      <reference local="UserID" foreign="UserID"/>
+    </foreign-key>
+    <foreign-key foreignTable="vendingmachine" name="ivid">
+      <reference local="vendingmachineID" foreign="vendingmachineID"/>
+    </foreign-key>
+    <index name="item_ibfk_2">
+      <index-column name="vendingmachineID"/>
+    </index>
+    <index name="item_ibfk_1">
+      <index-column name="UserID"/>
+    </index>
+    <index name="item_ibfk_3">
+      <index-column name="ProductID"/>
+    </index>
+    <index name="item_ibfk_4">
+      <index-column name="OfferID"/>
+    </index>
+    <vendor type="mysql">
+      <parameter name="Engine" value="InnoDB"/>
+    </vendor>
+  </table>
+  <table name="location" idMethod="native" phpName="Location">
+    <column name="LocationID" phpName="Locationid" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="AddressLine" phpName="Addressline" type="VARCHAR" size="10000" required="true"/>
+    <column name="TownCity" phpName="Towncity" type="VARCHAR" size="10000" required="true"/>
+    <column name="Country" phpName="Country" type="VARCHAR" size="10000" required="true"/>
+    <column name="delted" phpName="Delted" type="BOOLEAN" size="1" required="true" defaultValue="false"/>
+    <column name="Postcode" phpName="Postcode" type="VARCHAR" size="1000"/>
+    <vendor type="mysql">
+      <parameter name="Engine" value="InnoDB"/>
+    </vendor>
+  </table>
+  <table name="offer" idMethod="native" phpName="Offer">
+    <column name="OfferID" phpName="Offerid" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="Name" phpName="Name" type="VARCHAR" size="1000" required="true"/>
+    <column name="Description" phpName="Description" type="VARCHAR" size="10000" required="true"/>
+    <column name="ProductID" phpName="Productid" type="INTEGER"/>
+    <column name="UserID" phpName="Userid" type="INTEGER"/>
+    <column name="CompanyID" phpName="Companyid" type="INTEGER" required="true"/>
+    <column name="StartDate" phpName="Startdate" type="TIMESTAMP"/>
+    <column name="EndDate" phpName="Enddate" type="TIMESTAMP"/>
+    <column name="Quanitity" phpName="Quanitity" type="INTEGER"/>
+    <column name="Discount" phpName="Discount" type="DECIMAL" size="10" scale="2"/>
+    <column name="delted" phpName="Delted" type="BOOLEAN" size="1" required="true" defaultValue="false"/>
+    <foreign-key foreignTable="company" name="ocid">
+      <reference local="CompanyID" foreign="CompanyID"/>
+    </foreign-key>
+    <foreign-key foreignTable="product" name="opid">
+      <reference local="ProductID" foreign="ProductID"/>
+    </foreign-key>
+    <foreign-key foreignTable="user" name="ouid">
+      <reference local="UserID" foreign="UserID"/>
+    </foreign-key>
+    <index name="offer_ibfk_1">
+      <index-column name="CompanyID"/>
+    </index>
+    <index name="offer_ibfk_2">
+      <index-column name="ProductID"/>
+    </index>
+    <index name="offer_ibfk_3">
+      <index-column name="UserID"/>
+    </index>
+    <vendor type="mysql">
+      <parameter name="Engine" value="InnoDB"/>
+    </vendor>
+  </table>
+  <table name="permission" idMethod="native" phpName="Permission">
+    <column name="PermissionID" phpName="Permissionid" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="Name" phpName="Name" type="VARCHAR" size="1000" required="true"/>
+    <column name="Admin" phpName="Admin" type="BOOLEAN" size="1" required="true"/>
+    <column name="delted" phpName="Delted" type="BOOLEAN" size="1" required="true" defaultValue="false"/>
+    <vendor type="mysql">
+      <parameter name="Engine" value="InnoDB"/>
+    </vendor>
+  </table>
+  <table name="product" idMethod="native" phpName="Product">
+    <column name="ProductID" phpName="Productid" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="Name" phpName="Name" type="VARCHAR" size="1000" required="true"/>
+    <column name="Description" phpName="Description" type="VARCHAR" size="10000" required="true"/>
+    <column name="CompanyID" phpName="Companyid" type="INTEGER" required="true"/>
+    <column name="Image" phpName="Image" type="VARCHAR" size="10000" required="true"/>
+    <column name="delted" phpName="Delted" type="BOOLEAN" size="1" required="true" defaultValue="false"/>
+    <column name="Purchaseprice" phpName="Purchaseprice" type="DECIMAL" size="10" scale="2" required="true"/>
+    <foreign-key foreignTable="company" name="pcid">
+      <reference local="CompanyID" foreign="CompanyID"/>
+    </foreign-key>
+    <index name="product_ibfk_1">
+      <index-column name="CompanyID"/>
+    </index>
+    <vendor type="mysql">
+      <parameter name="Engine" value="InnoDB"/>
+    </vendor>
+  </table>
+  <table name="stock" idMethod="native" phpName="Stock">
+    <column name="StockID" phpName="Stockid" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="ProductID" phpName="Productid" type="INTEGER" required="true"/>
+    <column name="RetailPrice" phpName="Retailprice" type="DECIMAL" size="10" scale="2" required="true"/>
+    <column name="Quanitity" phpName="Quanitity" type="INTEGER" required="true"/>
+    <column name="vendingmachineID" phpName="Vendingmachineid" type="INTEGER" required="true"/>
+    <foreign-key foreignTable="product" name="spid">
+      <reference local="ProductID" foreign="ProductID"/>
+    </foreign-key>
+    <foreign-key foreignTable="vendingmachine" name="svid">
+      <reference local="vendingmachineID" foreign="vendingmachineID"/>
+    </foreign-key>
+    <index name="stock_ibfk_1">
+      <index-column name="ProductID"/>
+    </index>
+    <index name="stock_ibfk_2">
+      <index-column name="vendingmachineID"/>
+    </index>
+    <vendor type="mysql">
+      <parameter name="Engine" value="InnoDB"/>
+    </vendor>
+  </table>
+  <table name="user" idMethod="native" phpName="User">
+    <column name="UserID" phpName="Userid" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="FirstName" phpName="Firstname" type="VARCHAR" size="500" required="true"/>
+    <column name="LastName" phpName="Lastname" type="VARCHAR" size="500" required="true"/>
+    <column name="Email" phpName="Email" type="VARCHAR" size="5000" required="true"/>
+    <column name="PermissionID" phpName="Permissionid" type="INTEGER" required="true"/>
+    <column name="delted" phpName="Delted" type="BOOLEAN" size="1" required="true" defaultValue="false"/>
+    <column name="GenderID" phpName="Genderid" type="INTEGER" required="true"/>
+    <foreign-key foreignTable="gender" name="uGenderID">
+      <reference local="GenderID" foreign="GenderID"/>
+    </foreign-key>
+    <foreign-key foreignTable="permission" name="upid">
+      <reference local="PermissionID" foreign="PermissionID"/>
+    </foreign-key>
+    <index name="uGenderID">
+      <index-column name="GenderID"/>
+    </index>
+    <index name="upid">
+      <index-column name="PermissionID"/>
+    </index>
+    <vendor type="mysql">
+      <parameter name="Engine" value="InnoDB"/>
+    </vendor>
+  </table>
+  <table name="vendingmachine" idMethod="native" phpName="Vendingmachine">
+    <column name="vendingmachineID" phpName="Vendingmachineid" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="LocationID" phpName="Locationid" type="INTEGER" required="true"/>
+    <column name="CompanyID" phpName="Companyid" type="INTEGER" required="true"/>
+    <column name="Name" phpName="Name" type="VARCHAR" size="1000" required="true"/>
+    <column name="delted" phpName="Delted" type="BOOLEAN" size="1" required="true" defaultValue="false"/>
+    <foreign-key foreignTable="company" name="vCid">
+      <reference local="CompanyID" foreign="CompanyID"/>
+    </foreign-key>
+    <foreign-key foreignTable="location" name="vlid">
+      <reference local="LocationID" foreign="LocationID"/>
+    </foreign-key>
+    <index name="CompanyID">
+      <index-column name="CompanyID"/>
+    </index>
+    <index name="vendingmachine_ibfk_2">
+      <index-column name="LocationID"/>
+    </index>
+    <vendor type="mysql">
+      <parameter name="Engine" value="InnoDB"/>
+    </vendor>
+  </table>
+</database>
